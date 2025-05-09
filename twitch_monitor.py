@@ -14,6 +14,7 @@ class TwitchMonitor:
         """
         Get the top n channels on twitch measured by active viewers.
         """
+
         pass
 
     def monitor_loop(self):
@@ -25,3 +26,4 @@ class TwitchMonitor:
             pass
 
         pass
+
