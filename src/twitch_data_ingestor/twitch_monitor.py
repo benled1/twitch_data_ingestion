@@ -29,26 +29,32 @@ class TwitchMonitor:
         self._api_client: TwitchAPIClient = TwitchAPIClient(client_id=self._twitch_client_id, access_token=self._twitch_access_token )
 
     def start(self) -> None:
-        self.monitor_thread: threading.Thread = threading.Thread(target=self._monitor_loop)
-        self.monitor_thread.start()
+        try: 
+            self.monitor_thread: threading.Thread = threading.Thread(target=self._monitor_loop)
+            self.monitor_thread.start()
+        except Exception as e:
+            print(f"Error while starting monitor: {e}")
     
     def stop(self) -> None:
-        self._stop_event.set()
-        self._monitor_thread.join()
+        try:
+            self._stop_event.set()
+            self._monitor_thread.join()
+        except Exception as e:
+            print(f"Error while stopping monitor: {e}")
 
     def _get_top_n_channels(self, limit: int=None) -> List[str]:
         """
         Get the top n channels on twitch measured by active viewers. 
         returns a list of usernames
         """
-        streams: dict = self._api_client.get_streams()
+        streams: dict = self._api_client.get_streams(params={"first": limit})
         return [stream["user_name"] for stream in streams]
             
     def _monitor_loop(self):
         """
         Main event loop that updates the channels to monitor
         """
-        while self.active:
+        while not self._stop_event.is_set():
             self.active_channels = self._get_top_n_channels(limit=self.channel_limit)
 
             for channel_name in self.active_channels:
@@ -56,14 +62,28 @@ class TwitchMonitor:
                     chat_ingestor: ChatIngestor = ChatIngestor(channel_name=channel_name)
                     chat_ingestor.connect()
                     # do work here to add any other ingestors in the future
-                    self.active_ingestors[channel_name]["chat"] = [chat_ingestor]
-            
+                    self.active_ingestors[channel_name] = {"chat": chat_ingestor}
+
+            deletion_list : List = []
             for channel_name in self.active_ingestors:
                 if channel_name not in self.active_channels:
-                    chat_ingestor: ChatIngestor =  self.active_ingestors[channel_name]["chat"]
-                    chat_ingestor.disconnect()
-                    # do work here to remove any other ingestors in the future
-                    self.active_ingestors.pop(channel_name)
+                    deletion_list.append(channel_name)
+            for channel_name in deletion_list:
+                chat_ingestor: ChatIngestor =  self.active_ingestors[channel_name]["chat"]
+                chat_ingestor.disconnect()
+                # do work here to remove any other ingestors in the future
+                self.active_ingestors.pop(channel_name)
+            deletion_list = []
             time.sleep(5)
+
+        deletion_list: List = []
+        for channel_name in self.active_ingestors:
+            deletion_list.append(channel_name)
+        for channel_name in deletion_list:
+            chat_ingestor: ChatIngestor = self.active_ingestors[channel_name]["chat"]
+            chat_ingestor.disconnect()
+            self.active_ingestors.pop(channel_name)
+        deletion_list = []
+        assert(not self.active_ingestors) # check that active channels dict is empty.
 
 
