@@ -16,7 +16,7 @@ class TwitchMonitor:
     Only registered channels have data recorded and ingested. 
     """
 
-    def __init__(self, channel_limit: int=20):
+    def __init__(self, channel_limit: int=20) -> None:
         self.channel_limit: int = channel_limit
         self.active_channels: List = [] 
         self.active_ingestors: dict[str, dict[str, BaseIngestor]] = {}
@@ -50,7 +50,7 @@ class TwitchMonitor:
         streams: dict = self._api_client.get_streams(params={"first": limit})
         return [stream["user_name"] for stream in streams]
             
-    def _monitor_loop(self):
+    def _monitor_loop(self) -> None:
         """
         Main event loop that updates the channels to monitor
         """

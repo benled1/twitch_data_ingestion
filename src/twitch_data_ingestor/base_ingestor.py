@@ -10,3 +10,7 @@ class BaseIngestor(ABC):
     @abstractmethod
     def disconnect(self):
         pass
+
+    @abstractmethod
+    def ingest(self):
+        pass
