@@ -12,5 +12,5 @@ class BaseIngestor(ABC):
         pass
 
     @abstractmethod
-    def ingest(self):
+    def _ingest(self):
         pass

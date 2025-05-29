@@ -56,7 +56,7 @@ class TwitchMonitor:
         """
         while not self._stop_event.is_set():
             self.active_channels = self._get_top_n_channels(limit=self.channel_limit)
-            assert(len(self.active_channels)==self.channel_limit)
+            assert(len(self.active_channels)==self.channel_limit, f"{len(self.active_channels)} != {self.channel_limit}")
 
             for channel_name in self.active_channels:
                 if channel_name not in self.active_ingestors:

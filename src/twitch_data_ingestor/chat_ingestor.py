@@ -1,21 +1,62 @@
+import re
+import socket
 import time
 import threading
 from .base_ingestor import BaseIngestor
+from .config import get_twitch_config, TwitchConfig
 
 
 class ChatIngestor(BaseIngestor):
 
     def __init__(self, channel_name: str):
-        self.channel_name: str = channel_name
-        self.stop_event: threading.Event = threading.Event()
+        self._channel_name: str = channel_name
+        self._stop_event: threading.Event = threading.Event()
+        self._twitch_config: TwitchConfig = get_twitch_config()
+        self._ingestion_thread: threading.Thread = None
     
     def connect(self) -> None:
-        print(f"Connected to {self.channel_name}'s chat.")
-
+        try:
+            self._ingestion_thread: threading.Thread = threading.Thread(target=self._ingest)
+            self._ingestion_thread.start()
+        except Exception as e:
+            print(f"Error while connecting chat ingestor for {self._channel_name}: {e}")
+            
     def disconnect(self) -> None:
-        print(f"Diconnected from {self.channel_name}'s chat.")
+        try:
+            self._stop_event.set()
+            self._ingestion_thread.join()
+        except Exception as e:
+            print(f"Error while stopping monitor: {e}")
     
-    def ingest(self) -> None:
-        while not self.stop_event.is_set():
-            print(f"ingesting data from {self.channel_name}...")
-            time.sleep(5)
+    def _ingest(self) -> None:
+        server = "irc.chat.twitch.tv"
+        port = 6667
+
+        sock = socket.socket()
+        sock.connect((server, port))
+        sock.sendall(f"PASS oauth:{self._twitch_config.access_token}\r\n".encode("utf-8"))
+        sock.sendall(f"NICK {self._twitch_config.username}\r\n".encode("utf-8"))
+        sock.sendall(f"JOIN #{self._channel_name}\r\n".encode("utf-8"))
+
+        msg_pattern = re.compile(r"^:(\w+)!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :(.*)$")
+
+        buffer = ""
+        while not self._stop_event.is_set():
+            try:
+                buffer += sock.recv(2048).decode("utf-8")
+            except socket.error:
+                time.sleep(1)
+                sock.connect((server, port))
+                continue
+
+            lines = buffer.split("\r\n")
+            buffer = lines.pop()
+
+            for line in lines:
+                if line.startswith("PING"):
+                    sock.sendall("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
+                else:
+                    m = msg_pattern.match(line)
+                    if m:
+                        user, msg = m.groups()
+                        print(f"{self._channel_name}---<{user}>: {msg}")
