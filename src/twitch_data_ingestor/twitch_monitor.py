@@ -7,7 +7,6 @@ from .twitch_api_client import TwitchAPIClient
 from .chat_ingestor import ChatIngestor
 from .base_ingestor import BaseIngestor
 from dotenv import load_dotenv
-
 load_dotenv()
 
 class TwitchMonitor:
@@ -21,7 +20,8 @@ class TwitchMonitor:
         self.active_channels: List = [] 
         self.active_ingestors: dict[str, dict[str, BaseIngestor]] = {}
 
-
+        
+        self._monitor_interval: int = 30 # seconds
         self._monitor_thread: threading.Thread = None
         self._stop_event = threading.Event()
         self._twitch_client_id: str = os.getenv("TWITCH_CLIENT_ID")
@@ -56,6 +56,7 @@ class TwitchMonitor:
         """
         while not self._stop_event.is_set():
             self.active_channels = self._get_top_n_channels(limit=self.channel_limit)
+            assert(len(self.active_channels)==self.channel_limit)
 
             for channel_name in self.active_channels:
                 if channel_name not in self.active_ingestors:
@@ -74,11 +75,14 @@ class TwitchMonitor:
                 # do work here to remove any other ingestors in the future
                 self.active_ingestors.pop(channel_name)
             deletion_list = []
-            time.sleep(5)
+            assert(len(self.active_channels)==len(self.active_ingestors))
+            print("-----")
+            time.sleep(self._monitor_interval)
 
         deletion_list: List = []
         for channel_name in self.active_ingestors:
             deletion_list.append(channel_name)
+        
         for channel_name in deletion_list:
             chat_ingestor: ChatIngestor = self.active_ingestors[channel_name]["chat"]
             chat_ingestor.disconnect()
