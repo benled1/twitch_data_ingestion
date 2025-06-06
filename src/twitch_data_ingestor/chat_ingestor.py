@@ -68,7 +68,6 @@ class ChatIngestor(BaseIngestor):
                     continue
 
                 user, msg = m.groups()
-                # --- Instead of print, insert into MongoDB ---
                 doc = {
                     "channel": self._channel_name,
                     "user":    user,
@@ -76,6 +75,8 @@ class ChatIngestor(BaseIngestor):
                     "ts":       datetime.utcnow()
                 }
                 try:
+                    print(f"Inserting doc: {doc}")
+                    # improve perf here by collecting chats and then doing group writes.
                     self._coll.insert_one(doc)
                 except Exception as db_err:
                     # you may want better logging or retries here
