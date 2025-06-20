@@ -8,6 +8,8 @@ dependencies = [
     "pytest-cov",
     "python-dotenv",
     "ruff",
-    "pymongo"
+    "pymongo",
+    "fastapi",
+    "uvicorn"
 ]
 requires-python = ">=3.10"

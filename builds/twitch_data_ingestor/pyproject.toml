@@ -1,0 +1,15 @@
+[project]
+name = "twitch-data-ingestor"
+version = "0.1.0"
+description = "A Twitch data ingestion service"
+authors = [{ name = "Ben Ledingham" }]
+dependencies = [
+    "requests",
+    "pytest-cov",
+    "python-dotenv",
+    "ruff",
+    "pymongo",
+    "fastapi",
+    "uvicorn"
+]
+requires-python = ">=3.10"

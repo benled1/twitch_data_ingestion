@@ -4,8 +4,8 @@ import time
 import threading
 from datetime import datetime
 from pymongo import MongoClient
-from .base_ingestor import BaseIngestor
-from .config import get_twitch_config, TwitchConfig, get_mongo_config, MongoConfig
+from base_ingestor import BaseIngestor
+from config import get_twitch_config, TwitchConfig, get_mongo_config, MongoConfig
 
 class ChatIngestor(BaseIngestor):
 

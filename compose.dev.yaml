@@ -16,6 +16,24 @@ services:
 
     volumes:
       - mongo-data:/data/db
+  
+  api:
+    build:
+      context: .
+      dockerfile: builds/api/Dockerfile
+    container_name: api
+    ports:
+      - "8000:8000"
+  
+  ingestion:
+    build:
+      context: .
+      dockerfile: builds/twitch_data_ingestor/Dockerfile
+    container_name: twitch_data_ingestor
+    command: tail -f /dev/null
+    volumes:
+      - ./.env:/app/.env
+    
 
 volumes:
   mongo-data:
