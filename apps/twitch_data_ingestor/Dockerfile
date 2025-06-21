@@ -14,11 +14,11 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ENV PATH="/root/.local/bin:${PATH}"
 
-COPY builds/twitch_data_ingestor/pyproject.toml .
+COPY apps/twitch_data_ingestor/pyproject.toml .
 RUN uv venv && uv pip install --system .
 
 
-COPY ./src/twitch_data_ingestor .
+COPY ./apps/twitch_data_ingestor .
 
 CMD ["python3", "__main__.py"]
 
