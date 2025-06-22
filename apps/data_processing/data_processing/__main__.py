@@ -5,5 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 chat_proc = ChatProcessor(start=datetime(2025, 6, 19, 23, 59, 59), end=datetime(2025, 6, 21, 23, 59, 59))
-chat_proc.read_chats()
+channel_pos = chat_proc.compute_coords_jaccard()
+print(channel_pos)
+
+
 
