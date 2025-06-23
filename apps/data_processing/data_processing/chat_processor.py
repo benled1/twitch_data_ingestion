@@ -1,21 +1,23 @@
 import numpy as np
 from sklearn.manifold import MDS
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from config import MongoConfig, get_mongo_config
 from pymongo import MongoClient
 
 
 class ChatProcessor:
 
-    def __init__(self, start: datetime, end: datetime) -> None:
-        self.start: datetime = start
-        self.end: datetime = end
+    def __init__(self, month: date) -> None:
+        _month_bounds: tuple[datetime, datetime] = self._get_month_bounds(month)
+        self.start: datetime = _month_bounds[0]
+        self.end: datetime = _month_bounds[1]
         self._mongo_config: MongoConfig = get_mongo_config()
 
         client = MongoClient(self._mongo_config.uri)
         db = client[self._mongo_config.db]
         self._coll = db["twitch_chat"]
+    
 
     def compute_coords_jaccard(self) -> None:
         channel_user_map: defaultdict = self._map_channel_users()
@@ -23,6 +25,17 @@ class ChatProcessor:
         channel_positions: dict[str, np.ndarray] = self._reduce_distance_dimensions(distance_matrix, list(channel_user_map.keys()))
         return channel_positions
 
+    def _get_month_bounds(self, input_date: date) -> tuple[datetime, datetime]:
+        start = datetime(input_date.year, input_date.month, 1)
+
+        if input_date.month == 12:
+            next_month = datetime(input_date.year + 1, 1, 1)
+        else:
+            next_month = datetime(input_date.year, input_date.month + 1, 1)
+
+        end = next_month - timedelta(microseconds=1)
+
+        return start, end
 
     def _map_channel_users(self) -> defaultdict:
         channel_users_map: defaultdict = defaultdict(set)
