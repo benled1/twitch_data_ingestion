@@ -10,6 +10,7 @@ dependencies = [
     "ruff",
     "pymongo",
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "pydantic"
 ]
 requires-python = ">=3.10"

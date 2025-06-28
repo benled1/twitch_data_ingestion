@@ -19,7 +19,7 @@ class ChatProcessor:
         self._coll = db["twitch_chat"]
     
 
-    def compute_coords_jaccard(self) -> None:
+    def compute_coords_jaccard(self) -> dict[str, np.ndarray]:
         channel_user_map: defaultdict = self._map_channel_users()
         distance_matrix: list[list[float]] = self._compute_jaccard_similarity_distance_matrix(channel_user_map)
         channel_positions: dict[str, np.ndarray] = self._reduce_distance_dimensions(distance_matrix, list(channel_user_map.keys()))
@@ -79,23 +79,4 @@ class ChatProcessor:
         mds = MDS(n_components=3, dissimilarity="precomputed", random_state=42)
         coords = mds.fit_transform(distance_matrix)
         channel_positions = {channels[i]: coords[i] for i in range(len(channels))}
-
-        # script to show test plot
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.mplot3d import Axes3D
-
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-
-        xs, ys, zs = coords[:, 0], coords[:, 1], coords[:, 2]
-        ax.scatter(xs, ys, zs)
-
-        for i, name in enumerate(channels):
-            ax.text(xs[i], ys[i], zs[i], name)
-
-        plt.show()
-
-        print(type(coords[0]))
         return channel_positions
-    
-

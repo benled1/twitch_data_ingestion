@@ -1,7 +1,5 @@
 # TODO
-- leave ingestion service to run and collect chat messages.
-- create script to process data into 3D space
-
+- create an api to access data
 
 
 

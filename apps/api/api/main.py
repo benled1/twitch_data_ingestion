@@ -4,5 +4,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Stream Scape!"}
+    return {"message": "Welcome to Chat Scape!"}
+
+@app.get("/channels/", response_model=List[])
 
