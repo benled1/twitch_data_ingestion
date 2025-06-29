@@ -1,0 +1,13 @@
+[project]
+name = "core"
+version = "0.1.0"
+description = "Core libraries for twitch ingestion services"
+authors = [{ name = "Ben Ledingham" }]
+dependencies = [
+    "requests",
+    "pytest-cov",
+    "python-dotenv",
+    "ruff",
+    "pymongo",
+]
+requires-python = ">=3.10"

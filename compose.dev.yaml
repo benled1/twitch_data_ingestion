@@ -16,32 +16,40 @@ services:
 
     volumes:
       - mongo-data:/data/db
-  
-  api:
+
+  data_ingestor: 
     build:
       context: .
-      dockerfile: apps/api/Dockerfile
-    container_name: api
-    ports:
-      - "8000:8000"
-  
-  ingestion:
-    build:
-      context: .
-      dockerfile: apps/twitch_data_ingestor/Dockerfile
-    container_name: twitch_data_ingestor
-    command: tail -f /dev/null
+      dockerfile: apps/data_ingestor/Dockerfile
+    container_name: data_ingestor
     volumes:
-      - ./.env:/app/.env
+     - ./apps/data_ingestor/.env:/app/data_ingestor/.env
+
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/api/Dockerfile
+  #   container_name: api
+  #   ports:
+  #     - "8000:8000"
   
-  processing:
-    build:
-      context: .
-      dockerfile: apps/data_processing/Dockerfile
-    container_name: data_processing
-    command: tail -f /dev/null
-    volumes:
-      - ./.env:/app/.env
+  # ingestion:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/twitch_data_ingestor/Dockerfile
+  #   container_name: twitch_data_ingestor
+  #   command: tail -f /dev/null
+  #   volumes:
+  #     - ./.env:/app/.env
+  
+  # processing:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/data_processing/Dockerfile
+  #   container_name: data_processing
+  #   command: tail -f /dev/null
+  #   volumes:
+  #     - ./.env:/app/.env
     
 volumes:
   mongo-data:

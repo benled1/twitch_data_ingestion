@@ -3,9 +3,9 @@ import json
 import time
 import threading
 from typing import List
-from twitch_api_client import TwitchAPIClient
-from chat_ingestor import ChatIngestor
-from base_ingestor import BaseIngestor
+from core.utils import TwitchAPIClient
+from .chat_ingestor import ChatIngestor
+from .base_ingestor import BaseIngestor
 from dotenv import load_dotenv
 load_dotenv()
 
