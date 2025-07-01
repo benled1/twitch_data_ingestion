@@ -22,8 +22,16 @@ services:
       context: .
       dockerfile: apps/data_ingestor/Dockerfile
     container_name: data_ingestor
-    volumes:
-     - ./apps/data_ingestor/.env:/app/data_ingestor/.env
+    env_file:
+      - ./.env
+
+  data_processor: 
+    build:
+      context: .
+      dockerfile: apps/data_processor/Dockerfile
+    container_name: data_processor
+    env_file:
+      - ./.env
 
   # api:
   #   build:

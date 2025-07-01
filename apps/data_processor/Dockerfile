@@ -5,20 +5,28 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      build-essential \
+      curl \
+      cron && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
 ENV PATH="/root/.local/bin:${PATH}"
 
-COPY apps/data_processing/pyproject.toml .
-RUN uv venv && uv pip install --system .
+COPY core /app/core
+WORKDIR /app/core
+RUN uv pip install --system .
 
+COPY apps/data_processor /app/data_processor
+WORKDIR /app/data_processor
+RUN uv pip install --system .
 
-COPY ./apps/data_processing .
+COPY apps/data_processor/data_processor.cron /etc/cron.d/data_processor
+RUN chmod 0644 /etc/cron.d/data_processor \
+ && crontab /etc/cron.d/data_processor
 
-CMD ["python3", "__main__.py"]
+RUN touch /var/log/data_processor.log
 
+CMD ["cron", "-f"]

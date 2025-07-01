@@ -1,8 +1,5 @@
 import argparse
 from core.chat_ingestion import TwitchMonitor
-from dotenv import load_dotenv
-
-load_dotenv()
 
 if __name__ == "__main__":
     parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Run an ingestor service to collect external data.")

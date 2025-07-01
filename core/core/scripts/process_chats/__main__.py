@@ -1,14 +1,11 @@
 import os
 import argparse
 import numpy as np
+from .chat_processor import ChatProcessor
+from core.utils.config import MongoConfig, TwitchConfig, get_mongo_config, get_twitch_config
+from core.utils.twitch_api_client import TwitchAPIClient
 from datetime import datetime, date
-from chat_processor import ChatProcessor
-from dotenv import load_dotenv
-from config import MongoConfig, TwitchConfig, get_mongo_config, get_twitch_config
-from twitch_api_client import TwitchAPIClient
 from pymongo import MongoClient
-load_dotenv()
-
 
 def _process_chats(month: date) -> dict[str, np.ndarray]:
     chat_proc: ChatProcessor = ChatProcessor(month=month)

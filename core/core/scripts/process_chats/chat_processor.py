@@ -1,8 +1,8 @@
 import numpy as np
+from core.utils.config import MongoConfig, get_mongo_config
 from sklearn.manifold import MDS
 from collections import defaultdict
 from datetime import datetime, date, timedelta
-from config import MongoConfig, get_mongo_config
 from pymongo import MongoClient
 
 

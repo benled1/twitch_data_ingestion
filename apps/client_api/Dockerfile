@@ -14,10 +14,13 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ENV PATH="/root/.local/bin:${PATH}"
 
-COPY apps/api/pyproject.toml .
-RUN uv venv && uv pip install --system .
+COPY core /app/core
+RUN uv pip install --system ./core
 
-COPY ./apps/api .
+
+COPY apps/data_processor /app/data_processor
+WORKDIR /app/data_processor
+RUN uv pip install --system .
 
 EXPOSE 8000
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
