@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 
+
 @dataclass
 class TwitchConfig:
     client_id: str
@@ -28,6 +29,7 @@ def get_twitch_config() -> TwitchConfig:
     return _twitch_config
 
 def _get_mongo_config() -> MongoConfig:
+    print(os.getenv("MONGO_URI"))
     return MongoConfig(
         uri=os.getenv("MONGO_URI"),
         db=os.getenv("MONGO_DB")

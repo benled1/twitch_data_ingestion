@@ -18,9 +18,9 @@ COPY core /app/core
 RUN uv pip install --system ./core
 
 
-COPY apps/data_processor /app/data_processor
-WORKDIR /app/data_processor
+COPY apps/client_api /app/client_api
+WORKDIR /app/client_api
 RUN uv pip install --system .
 
 EXPOSE 8000
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "client_api.main:app", "--host", "0.0.0.0", "--port", "8000"]

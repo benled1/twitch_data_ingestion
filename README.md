@@ -2,6 +2,10 @@
 - create an api to access data
 
 
+# NICE TODO
+- install pylance for type checking enforcement
+
+
 
 # Developer Guide
 
