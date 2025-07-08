@@ -3,8 +3,12 @@ from pydantic import BaseModel, Field
 from pydantic_core import core_schema
 from bson import ObjectId
 from bson.errors import InvalidId
+from datetime import datetime
 
 class PyObjectId(ObjectId):
+    """
+    Custom type to allow use of MongoDB ObjectId type in Pydantic
+    """
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any) -> core_schema.CoreSchema:
         return core_schema.no_info_plain_validator_function(cls._validate)
@@ -20,14 +24,14 @@ class PyObjectId(ObjectId):
                 raise ValueError("Invalid ObjectId string")
         raise TypeError("ObjectId must be a string or ObjectId instance")
 
-
 class Channel(BaseModel):
     id: Annotated[PyObjectId, Field(alias="_id")]
     channel: str
     metadata: Optional[Dict[str, List[Dict[Any, Any]]]]
 
-    model_config = {
-        "populate_by_name": True,
-        "arbitrary_types_allowed": True,
-        "json_encoders": {ObjectId: str}
-    }
+class ChannelCoordinates(BaseModel):
+    id: Annotated[PyObjectId, Field(alias="_id")]
+    channel: str
+    coords: List[float]
+    month: datetime
+    ts: datetime

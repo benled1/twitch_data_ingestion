@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
-from typing import List, Annotated
-from .models import Channel
+from typing import List, Annotated, Any
+from .models import Channel, ChannelCoordinates
 from .db import DBClient
 
 app = FastAPI()
@@ -13,3 +13,12 @@ async def get_channels(limit: Annotated[int, Query(gt=0, le=1000)] = 100) -> Lis
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to fetch channels")
     return channels
+
+@app.get("/coordinates", response_model=List[ChannelCoordinates])
+async def get_coordinates(channel_name: str) -> List[ChannelCoordinates]:
+    try:
+        coordinates = db_client.get_coordinates(channel_name=channel_name)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch channels with exception: {e}")
+    print(f"The reponse = {coordinates}")
+    return coordinates

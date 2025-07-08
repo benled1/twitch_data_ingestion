@@ -2,25 +2,17 @@
 - create an api to access data
 
 
-# NICE TODO
+# IMPROVEMENTS (nice to have)
+- consolidate channels and channel_coords in the data model oopsie  
 - install pylance for type checking enforcement
 
 
 
 # Developer Guide
 
-Run the mongoDB
+1. Create a .env from the template in the root of the project
+
+2. Run using docker compose
 ```
-
+docker compose -f compose.dev.yaml up --build -d
 ```
-
-Run the ingestor 
-```
-source .venv/bin/activate
-uv pip install .
-cd src
-python -m twitch_data_ingestor
-```
-
-
-
