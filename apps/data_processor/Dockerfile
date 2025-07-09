@@ -24,9 +24,11 @@ WORKDIR /app/data_processor
 RUN uv pip install --system .
 
 COPY apps/data_processor/data_processor.cron /etc/cron.d/data_processor
+COPY apps/data_processor/entrypoint.sh /entrypoint.sh
+
 RUN chmod 0644 /etc/cron.d/data_processor \
- && crontab /etc/cron.d/data_processor
+ && chmod +x /entrypoint.sh
 
 RUN touch /var/log/data_processor.log
 
-CMD ["cron", "-f"]
+ENTRYPOINT ["/entrypoint.sh"]

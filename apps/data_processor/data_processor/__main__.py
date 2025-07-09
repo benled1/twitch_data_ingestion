@@ -1,10 +1,13 @@
 import logging
 import os
 import subprocess
+import sys
+from datetime import datetime
 
 def chat_process_cron() -> None:
+    curr_month = datetime.utcnow().strftime("%Y-%m")
     res = subprocess.run(
-        ["python", "-m", "core.scripts.process_chats"],
+        [sys.executable, "-m", "core.scripts.process_chats", "--month", curr_month],
         capture_output=True,
         text=True
     )
