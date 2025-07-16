@@ -1,3 +1,3 @@
 SHELL=/bin/bash
 PATH=/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-59 * * * * root cd /app/data_processor && echo "ran at $(date)" >> /tmp/cron_heartbeat.log && source /container_env.sh && python3 -m data_processor >> /var/log/data_processor.log 2>&1
+0 2 * * * root cd /app/data_processor && echo "ran at $(date)" >> /tmp/cron_heartbeat.log && source /container_env.sh && python3 -m data_processor >> /var/log/data_processor.log 2>&1

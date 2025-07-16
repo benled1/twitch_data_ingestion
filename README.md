@@ -1,12 +1,9 @@
 # TODO
 - create an api to access data
 
-
 # IMPROVEMENTS (nice to have)
 - consolidate channels and channel_coords in the data model oopsie  
 - install pylance for type checking enforcement
-
-
 
 # Developer Guide
 

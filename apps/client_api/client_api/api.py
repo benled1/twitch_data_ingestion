@@ -1,10 +1,20 @@
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Annotated, Any
 from .models import Channel, ChannelCoordinates
 from .db import DBClient
 
 app = FastAPI()
 db_client: DBClient = DBClient()
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/channels", response_model=List[Channel])
 async def get_channels(limit: Annotated[int, Query(gt=0, le=1000)] = 100) -> List[Channel]:
