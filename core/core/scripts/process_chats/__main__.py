@@ -8,6 +8,8 @@ from datetime import datetime, date, timedelta
 from pymongo import MongoClient
 from collections import defaultdict
 from core.scripts.process_chats.utils import get_channel_chat_map, update_chats
+from core.scripts.process_chats.calc_distance import compute_distance__jaccard_similarity
+from core.scripts.process_chats.calc_cluster_3d import _reduce_distance_dimensions_mds
 
 if __name__ == "__main__":
     parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Process pre-ingested twitch data.")
@@ -20,7 +22,9 @@ if __name__ == "__main__":
         exit(1)
     
     channel_user_map: defaultdict[str, list[str]] = get_channel_chat_map(month=parsed_date)
-    chat_to_coordinate_processor: ChatToCoordinateProcessor = ChatToCoordinateProcessor(channel_user_map=channel_user_map, )
+    chat_to_coordinate_processor: ChatToCoordinateProcessor = ChatToCoordinateProcessor(channel_user_map=channel_user_map, 
+                                                                                        get_channel_distance=compute_distance__jaccard_similarity,
+                                                                                        cluster_channels_3d=_reduce_distance_dimensions_mds)
     channel_pos: dict[str, np.ndarray] = chat_to_coordinate_processor.get_channel_coordinates()
     res: int = update_chats(channel_pos=channel_pos, month=parsed_date)
     exit(res)

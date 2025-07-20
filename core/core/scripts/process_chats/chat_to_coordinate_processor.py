@@ -13,8 +13,8 @@ class ChatToCoordinateProcessor:
     def __init__(
         self, 
         channel_user_map: defaultdict[str, list[str]],
-        get_channel_distance: Callable[[defaultdict[str, list[str]]]],
-        cluster_channels_3d: Callable[[list[list[float]]]],
+        get_channel_distance: Callable[[defaultdict[str, list[str]]], list[list[float]]],
+        cluster_channels_3d: Callable[[list[list[float]], list[str]], dict[str, np.ndarray]],
         ) -> None:
         self._channel_user_map: defaultdict[str, list[str]] = channel_user_map
         self._get_channel_distance = get_channel_distance
