@@ -25,9 +25,9 @@ async def get_channels(limit: Annotated[int, Query(gt=0, le=1000)] = 100) -> Lis
     return channels
 
 @app.get("/coordinates", response_model=List[ChannelCoordinates])
-async def get_coordinates(channel_name: str) -> List[ChannelCoordinates]:
+async def get_coordinates(channel_name: str, month: str) -> List[ChannelCoordinates]:
     try:
-        coordinates = db_client.get_coordinates(channel_name=channel_name)
+        coordinates = db_client.get_coordinates(channel_name=channel_name, month=month)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch channels with exception: {e}")
     print(f"The reponse = {coordinates}")

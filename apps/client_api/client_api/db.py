@@ -2,6 +2,7 @@ from typing import List
 from .models import Channel, ChannelCoordinates
 from core.utils.config import MongoConfig, get_mongo_config
 from pymongo import MongoClient
+from datetime import datetime, timezone
 
 class DBClient():
     def __init__(self) -> None:
@@ -15,6 +16,14 @@ class DBClient():
         cursor = self._channels_coll.find().sort("_id", -1).limit(limit)
         return list(cursor)
     
-    def get_coordinates(self, channel_name: str) -> List[ChannelCoordinates]:
-        cursor = self._coordinates_coll.find({"channel": {"$eq": channel_name}})
+    def get_coordinates(self, channel_name: str, month: str) -> List[ChannelCoordinates]:
+        target_month=""
+        try:
+            target_month = datetime.strptime(month, "%Y-%m").replace(tzinfo=timezone.utc)
+        except ValueError as e:
+            raise ValueError(f"Invalid month format '{month}'. Expected 'YYYY-MM'.") from e
+        cursor = self._coordinates_coll.find({
+            "channel": {"$eq": channel_name},
+            "month": {"$eq": target_month}            
+            })
         return list(cursor)

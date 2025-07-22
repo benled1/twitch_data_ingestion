@@ -3,8 +3,6 @@
 - Develop a way of testing clustering and distance algorithms that is quick and conclusive
   - Develop a quick way of swapping between different clustering and distance algorithms
     - Isolate distance calc, clustering from ChatProcessor and inject as dependencies
-    - Produce plots to help eval different methods
-      - should produce heatmap plot of distance matrix
   - Develop a metric or standard for testing how good a set of algorithms is
 
 
