@@ -1,7 +1,7 @@
 import os
 import argparse
 import numpy as np
-from .chat_to_coordinate_processor import ChatToCoordinateProcessor
+from .chat_processor import ChatProcessor
 from core.utils.config import MongoConfig, TwitchConfig, get_mongo_config, get_twitch_config
 from core.utils.twitch_api_client import TwitchAPIClient
 from datetime import datetime, date, timedelta
