@@ -8,6 +8,8 @@ dependencies = [
     "pytest-cov",
     "python-dotenv",
     "ruff",
-    "pymongo"
+    "pymongo",
+    "numpy",
+    "scikit-learn",
 ]
 requires-python = ">=3.10"

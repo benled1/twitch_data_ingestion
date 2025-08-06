@@ -18,7 +18,12 @@
 
 
 # BUGS
-- updating coords overrides previous month coords 
+## Sev-1 
+- many missing channels from the visualization.
+  - ex. Ludwig is in the channel coords for month of July but is not in the final visualization.
+  - this could be a prob with either the client api or the frontend.
+
+
 
 
 https://chatgpt.com/share/68787660-6ad4-800f-a158-55d22c375565

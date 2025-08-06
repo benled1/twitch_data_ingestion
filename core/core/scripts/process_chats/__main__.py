@@ -14,7 +14,6 @@ from core.scripts.process_chats.calc_3d_embedding import compute_3d_coords, comp
 if __name__ == "__main__":
     parser: argparse.ArgumentParser = argparse.ArgumentParser(description="Process pre-ingested twitch data.")
     parser.add_argument("--month", required=True, help="Month in YYYY-MM format")
-    parser.add_argument("--include_edges", required=False, default=False, help="If true, process using an algorithm which produces edges between nodes.")
     parser.add_argument("--similarity-type", required=False, default="jaccard", help="Specify which type of similarity algorithm to use.")
     args = parser.parse_args()
     try:
@@ -31,14 +30,12 @@ if __name__ == "__main__":
         print("Invalid similarity-type. Must be one of jaccard, ")
         exit(1)
 
-    if args.include_edges:
-        calc_3d_embedding_func = compute_3d_coords_w_edges
-    else: 
-        calc_3d_embedding_func = compute_3d_coords
-
     chat_to_coordinate_processor: ChatProcessor = ChatProcessor(channel_user_map=channel_user_map, 
-                                                                                        calc_distance_func=compute_distance__jaccard_similarity,
-                                                                                        calc_3d_embedding_func=calc_3d_embedding_func)
-    channel_pos: dict[str, np.ndarray] = chat_to_coordinate_processor.get_channel_coordinates()
-    res: int = update_chats(channel_pos=channel_pos, month=parsed_date)
+                                                                                        calc_distance_func=distance_func,
+                                                                                        calc_3d_embedding_func=compute_3d_coords_w_edges)
+    channel_embeddings: dict[str, dict] = chat_to_coordinate_processor.get_channel_embeddings()
+    print(f"Channel embeddings: {channel_embeddings}")
+
+    # UPDATE THE update_chats FUNCTION to use the new data return type
+    res: int = update_chats(channel_embeddings=channel_embeddings, month=parsed_date)
     exit(res)

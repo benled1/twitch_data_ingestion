@@ -2,10 +2,11 @@ from sklearn.manifold import MDS, TSNE
 import numpy as np
 from typing import Optional, Any
 
-def compute_3d_coords(distance_matrix: list[list[float]], channels: list[str]) -> dict[str, np.ndarray]:
+def compute_3d_coords(distance_matrix: list[list[float]], channels: list[str]) -> dict[str, dict]:
     mds = MDS(n_components=3, dissimilarity="precomputed", random_state=42)
     coords = mds.fit_transform(distance_matrix)
     channel_positions: dict[str, np.ndarray] = {channels[i]: coords[i] for i in range(len(channels))}
+    
     return channel_positions
 
 def compute_3d_coords_w_edges(distance_matrix: list[list[float]], channel_names: list[str]) -> dict[str, dict]:
@@ -16,15 +17,13 @@ def compute_3d_coords_w_edges(distance_matrix: list[list[float]], channel_names:
     assert D.shape == (n, n), "distance matrix must be square"
     assert len(channel_names) == n
 
-    # 1) compute a 3D embedding via MDS
     mds = MDS(
         n_components=3,
         dissimilarity='precomputed',
         random_state=0
     )
-    coords = mds.fit_transform(D)  # shape (n,3)
+    coords = mds.fit_transform(D)
 
-    # 2) build nodes
     nodes = [
         {
             "id": channel_names[i],
@@ -35,17 +34,18 @@ def compute_3d_coords_w_edges(distance_matrix: list[list[float]], channel_names:
         for i in range(n)
     ]
 
-    # 3) build edges
     edges = []
     for i in range(n):
         for j in range(i+1, n):
             raw_d = float(D[i,j])
             val = 1 - raw_d if similarity else raw_d
             if threshold is None or val >= threshold:
-                edges.append({
+                curr_embedding = {
                     "source": channel_names[i],
                     "target": channel_names[j],
                     "value": val
-                })
+                }
+                print(f"Appending {curr_embedding}...")
+                edges.append(curr_embedding)
 
     return {"nodes": nodes, "edges": edges}

@@ -51,37 +51,58 @@ def get_channel_chat_map(month: date) -> defaultdict[str, list[str]]:
 
     return channel_users_map
 
-def update_chats(channel_pos: dict[str, np.ndarray], month: date) -> None: 
+def update_chats(channel_embeddings: dict[str, dict], month: date) -> None: 
     _mongo_config: MongoConfig = get_mongo_config()
     _twitch_config: TwitchConfig = get_twitch_config()
     twitch_client: TwitchAPIClient = TwitchAPIClient(_twitch_config.client_id, _twitch_config.access_token) 
     mongo_client = MongoClient(_mongo_config.uri)
     db = mongo_client[_mongo_config.db]
-
-    _coords_coll = db["channel_coords"]
+    _node_coll = db["channel_nodes"]
+    _edges_coll = db["channel_edges"]
     _channel_metadata_coll = db["channels"]
-    for channel in channel_pos:
-        coords_doc = {
-            "channel": channel,
-            "coords": channel_pos[channel].tolist(),
+
+    for node in channel_embeddings["nodes"]:
+        node_channel = node["id"]
+        channel_metadata = twitch_client.get_channel_info(params={"login": node_channel})
+
+        node_doc = {
+            "channel": node_channel,
+            "position": {"x": node["x"], "y": node["y"], "z": node["z"]},
             "month": datetime.combine(month, datetime.min.time()),
             "ts": datetime.utcnow()
         }
 
-        channel_metadata = twitch_client.get_channel_info(params={"login": channel})
         channel_metadata_doc = {
-            "channel": channel,
+            "channel": node_channel,
             "metadata": channel_metadata
         }
 
         try:
-            print(f"Updating or Inserting coords for {channel}...")
-            filter = {"channel": channel}
-            _coords_coll.update_one(filter, {"$set": coords_doc}, upsert=True)
-            print(f"Updating or Inserting channel metadata for {channel}...")
-            _channel_metadata_coll.update_one(filter, {"$set": channel_metadata_doc}, upsert=True)
+            print(f"Updating or inserting node info for {node_channel}...")
+            node_filter = {"channel": node_channel, "month": datetime.combine(month, datetime.min.time())}
+            _node_coll.update_one(node_filter, {"$set": node_doc}, upsert=True)
+            print(f"Updating or Inserting channel metadata for {node_channel}...")
+            metadata_filter = {"channel": node_channel}
+            _channel_metadata_coll.update_one(metadata_filter, {"$set": channel_metadata_doc}, upsert=True)
 
         except Exception as db_err:
-            print(f"Mongo insert error: {db_err}")
+            print(f"Mongo insert error while inserting nodes: {db_err}")
             return 1
+    
+    for edge in channel_embeddings["edges"]:
+        edge_doc = {
+            "source_id": edge["source"],
+            "target_id": edge["target"],
+            "value": edge["value"],
+            "month": datetime.combine(month, datetime.min.time()),
+            "ts": datetime.utcnow()
+        }
+        try:
+            print(f"Updating or inserting edge info for {edge['source']} --> {edge['target']}...")
+            edge_filter = {"source_id": edge["source"], "target_id": edge["target"], "month": datetime.combine(month, datetime.min.time())}
+            _edges_coll.update_one(edge_filter, {"$set": edge_doc}, upsert=True)
+        except Exception as db_err:
+            print(f"Mongo insert error while inserting edges: {db_err}")
+            return 1
+        
     return 0
