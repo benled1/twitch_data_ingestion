@@ -35,3 +35,24 @@ class ChannelCoordinates(BaseModel):
     coords: List[float]
     month: datetime
     ts: datetime
+
+class NodePosition(BaseModel):
+    x: float
+    y: float
+    z: float
+
+class ChannelNode(BaseModel):
+    id: Annotated[PyObjectId, Field(alias="_id")]
+    channel: str
+    month: datetime
+    position: NodePosition
+    ts: datetime
+
+class ChannelEdge(BaseModel):
+    id: Annotated[PyObjectId, Field(alias="_id")]
+    month: datetime
+    source_id: str
+    target_id: str
+    ts: datetime
+    value: float
+    

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Annotated, Any
-from .models import Channel, ChannelCoordinates
+from .models import Channel, ChannelCoordinates, ChannelNode, ChannelEdge
 from .db import DBClient
 
 app = FastAPI()
@@ -32,3 +32,23 @@ async def get_coordinates(channel_name: str, month: str) -> List[ChannelCoordina
         raise HTTPException(status_code=500, detail=f"Failed to fetch channels with exception: {e}")
     print(f"The reponse = {coordinates}")
     return coordinates
+
+@app.get("/channel_node", response_model=ChannelNode)
+async def get_channel_node(channel_name: str, month: str) -> ChannelNode:
+    try:
+        node = db_client.get_nodes(channel_name=channel_name, month=month)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch channels with exception: {e}")
+    return node
+
+
+@app.get("/channel_edges", response_model=List[ChannelEdge])
+async def get_channel_edges(channel_name: str, month: str) -> List[ChannelEdge]:
+    print(f"channel name = {channel_name}")
+    print(f"month = {month}")
+    try:
+        edges = db_client.get_source_edges(channel_name=channel_name, month=month)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch channels with exception: {e}")
+    print(f"The reponse = {edges}")
+    return edges
